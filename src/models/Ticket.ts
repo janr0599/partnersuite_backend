@@ -41,6 +41,10 @@ const TicketSchema: Schema = new Schema(
         //     type: Types.ObjectId,
         //     ref: "User",
         // },
+        //manager: {
+        //     type: Types.ObjectId,
+        //     ref: "User",
+        // },
         // comments: [
         //     {
         //         type: Types.ObjectId,
