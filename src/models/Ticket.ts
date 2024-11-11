@@ -45,12 +45,12 @@ const TicketSchema: Schema = new Schema(
         //     type: Types.ObjectId,
         //     ref: "User",
         // },
-        // comments: [
-        //     {
-        //         type: Types.ObjectId,
-        //         ref: "Comment",
-        //     },
-        // ],
+        comments: [
+            {
+                type: Types.ObjectId,
+                ref: "Comment",
+            },
+        ],
     },
     { timestamps: true }
 );

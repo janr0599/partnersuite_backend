@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import Ticket from "../models/Ticket";
 
 class TicketsController {
-    static async createTicket(req: Request, res: Response) {
+    static createTicket = async (req: Request, res: Response) => {
         const ticket = new Ticket(req.body);
         try {
             await ticket.save();
@@ -10,26 +10,28 @@ class TicketsController {
         } catch (error) {
             res.status(500).json({ message: "there's been an error" });
         }
-    }
-    static async getTickets(req: Request, res: Response) {
+    };
+    static getTickets = async (req: Request, res: Response) => {
         try {
             const tickets = await Ticket.find();
             res.status(200).json({ tickets: tickets });
         } catch (error) {
             res.status(500).json({ message: "there's been an error" });
         }
-    }
+    };
 
-    static async getTicketById(req: Request, res: Response) {
+    static getTicketById = async (req: Request, res: Response) => {
         try {
-            const ticket = await Ticket.findById(req.ticket._id);
+            const ticket = await Ticket.findById(req.ticket._id).populate({
+                path: "comments",
+            });
 
             res.status(200).json({ ticket: ticket });
         } catch (error) {
             res.status(500).json({ message: "there's been an error" });
         }
-    }
-    static async deleteTicket(req: Request, res: Response) {
+    };
+    static deleteTicket = async (req: Request, res: Response) => {
         try {
             const ticket = await Ticket.findById(req.ticket._id);
             await ticket.deleteOne();
@@ -37,9 +39,9 @@ class TicketsController {
         } catch (error) {
             res.status(500).json({ message: "there's been an error" });
         }
-    }
+    };
 
-    static async updateTicketStatus(req: Request, res: Response) {
+    static updateTicketStatus = async (req: Request, res: Response) => {
         try {
             const ticket = await Ticket.findById(req.ticket._id);
             ticket.status = req.body.status;
@@ -50,7 +52,7 @@ class TicketsController {
         } catch (error) {
             res.status(500).json({ message: "there's been an error" });
         }
-    }
+    };
 }
 
 export default TicketsController;

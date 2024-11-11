@@ -5,6 +5,7 @@ import {
     validateTicketExists,
 } from "../middleware/ticketsMiddleware";
 import { validateObjectId } from "../middleware/validationMiddleware";
+import CommentsRoutes from "./commentsRoutes";
 
 const router = Router();
 
@@ -16,5 +17,8 @@ router.get("/", TicketsController.getTickets);
 router.get("/:ticketId", TicketsController.getTicketById);
 router.patch("/:ticketId", TicketsController.updateTicketStatus);
 router.delete("/:ticketId", TicketsController.deleteTicket);
+
+// Comments Routes
+router.use("/:ticketId/comments", CommentsRoutes);
 
 export default router;

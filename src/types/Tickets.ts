@@ -12,6 +12,6 @@ export type TicketType = Document & {
     category: TicketCategory;
     // createdBy: Types.ObjectId;
     // manager: Types.ObjectId;
-    // comments: Types.ObjectId[];
+    comments: Types.ObjectId[];
     _id: Types.ObjectId;
 };
