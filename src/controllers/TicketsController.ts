@@ -38,6 +38,19 @@ class TicketsController {
             res.status(500).json({ message: "there's been an error" });
         }
     }
+
+    static async updateTicketStatus(req: Request, res: Response) {
+        try {
+            const ticket = await Ticket.findById(req.ticket._id);
+            ticket.status = req.body.status;
+            await ticket.save();
+            res.status(200).json({
+                message: "Ticket status updated successfully",
+            });
+        } catch (error) {
+            res.status(500).json({ message: "there's been an error" });
+        }
+    }
 }
 
 export default TicketsController;
