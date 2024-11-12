@@ -6,8 +6,8 @@ export const validateObjectId = (
     res: Response,
     next: NextFunction
 ) => {
-    const { ticketId } = req.params;
-    const validation = objectIdSchema.safeParse(ticketId);
+    const { ticketId, commentId } = req.params;
+    const validation = objectIdSchema.safeParse(ticketId || commentId);
 
     if (!validation.success) {
         res.status(400).json(validation.error.issues);

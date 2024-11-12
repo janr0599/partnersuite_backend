@@ -6,3 +6,7 @@ export type CommentType = Document & {
     ticket: Types.ObjectId;
     _id: Types.ObjectId;
 };
+
+export type CommentParams = {
+    commentId: string;
+};
