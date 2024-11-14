@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
-import User, { roles } from "../models/User";
 import { checkPassword, hashPassword } from "../utils/auth";
 import { generateJWT } from "../utils/jwt";
+import Manager from "../models/Manager";
+import Affiliate from "../models/Affiliate";
 
 class AuthController {
     static createAccount = async (req: Request, res: Response) => {
@@ -9,7 +10,7 @@ class AuthController {
             const { email, password } = req.body;
 
             // Prevent duplicate emails
-            const userExists = await User.findOne({ email });
+            const userExists = await Manager.findOne({ email });
             if (userExists) {
                 const error = new Error("Email already exists");
                 res.status(409).json({ message: error.message });
@@ -20,10 +21,9 @@ class AuthController {
             const hashedPassword = await hashPassword(password);
 
             // Crate new user
-            const newManager = new User({
+            const newManager = new Manager({
                 ...req.body,
                 password: hashedPassword,
-                role: roles.manager,
                 affiliates: [],
             });
 
@@ -37,7 +37,11 @@ class AuthController {
     static login = async (req: Request, res: Response) => {
         try {
             const { email, password } = req.body;
-            const user = await User.findOne({ email });
+
+            let user = await Manager.findOne({ email });
+            if (!user) {
+                user = await Affiliate.findOne({ email });
+            }
 
             // Confirm user
             if (!user) {

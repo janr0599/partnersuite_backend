@@ -12,9 +12,13 @@ export const userSchema = z.object({
         .trim()
         .min(8, "Password must be at least 8 characters"),
     confirmPassword: z.string().trim().min(1, "Please confirm your password"),
+    platform: z.string().trim().min(1, "Platform cannot be empty"),
+    contractType: z.enum(["CPA", "RevShare", "Hybrid"]),
+    CPA: z.number().optional(),
+    RevShare: z.number().optional(),
 });
 
-export const registrationSchema = userSchema
+export const managerRegistrationSchema = userSchema
     .pick({
         name: true,
         email: true,
@@ -25,6 +29,16 @@ export const registrationSchema = userSchema
         message: "Passwords do not match",
         path: ["confirmPassword"], // Specify the path to show the error message
     });
+
+export const affiliateRegistrationSchema = userSchema;
+export const affiliateUpdateSchema = userSchema.pick({
+    name: true,
+    email: true,
+    platform: true,
+    contractType: true,
+    CPA: true,
+    RevShare: true,
+});
 
 export const loginSchema = userSchema
     .pick({

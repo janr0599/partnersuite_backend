@@ -6,8 +6,11 @@ import {
 } from "../middleware/ticketsMiddleware";
 import { validateObjectId } from "../middleware/validationMiddleware";
 import CommentsRoutes from "./commentsRoutes";
+import { authenticate } from "../middleware/authMiddleware";
 
 const router = Router();
+
+router.use(authenticate);
 
 router.param("ticketId", validateObjectId);
 router.param("ticketId", validateTicketExists);

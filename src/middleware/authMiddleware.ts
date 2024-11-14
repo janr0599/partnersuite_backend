@@ -1,8 +1,13 @@
 import { Request, Response, NextFunction } from "express";
-import { loginSchema, registrationSchema } from "../schemas/usersSchemas";
 import jwt from "jsonwebtoken";
-import User from "../models/User";
-import { UserType } from "../types/Users";
+import Manager from "../models/Manager";
+import Affiliate from "../models/Affiliate";
+import { UserType } from "../types/User";
+import {
+    affiliateRegistrationSchema,
+    loginSchema,
+    managerRegistrationSchema,
+} from "../schemas/usersSchemas";
 
 declare global {
     namespace Express {
@@ -12,12 +17,26 @@ declare global {
     }
 }
 
-export const validateUserData = async (
+export const validateManagerData = async (
     req: Request,
     res: Response,
     next: NextFunction
 ) => {
-    const validation = registrationSchema.safeParse(req.body);
+    const validation = managerRegistrationSchema.safeParse(req.body);
+    if (!validation.success) {
+        res.status(400).json({ message: validation.error.issues });
+        return;
+    } else {
+        next();
+    }
+};
+
+export const validateAffiliateData = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    const validation = affiliateRegistrationSchema.safeParse(req.body);
     if (!validation.success) {
         res.status(400).json({ message: validation.error.issues });
         return;
@@ -57,13 +76,18 @@ export const authenticate = async (
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
         if (typeof decoded === "object" && decoded.id) {
-            const user = await User.findById(decoded.id).select(
-                "_id email name role affiliates"
-            );
+            let user: UserType | null = null;
+            if (decoded.role === "manager") {
+                user = await Manager.findById(decoded.id);
+            } else if (decoded.role === "affiliate") {
+                user = await Affiliate.findById(decoded.id);
+            }
+
             if (user) {
                 req.user = user;
             } else {
                 res.status(500).json({ error: "Invalid token" });
+                return;
             }
         }
     } catch (error) {

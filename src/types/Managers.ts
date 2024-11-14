@@ -1,14 +1,10 @@
 import { Document, Types } from "mongoose";
-import { roles } from "../models/User";
 
-export type Roles = (typeof roles)[keyof typeof roles];
-
-export type UserType = Document & {
+export type ManagerType = Document & {
     name: string;
     email: string;
     password: string;
-    role: Roles;
-    manager: Types.ObjectId;
+    role: string;
     affiliates: Types.ObjectId[];
     _id: Types.ObjectId;
 };

@@ -1,14 +1,33 @@
 import { Router } from "express";
-import { authenticate, validateUserData } from "../middleware/authMiddleware";
+import {
+    authenticate,
+    validateAffiliateData,
+} from "../middleware/authMiddleware";
 import AffiliatesController from "../controllers/AffiliatesController";
+import { validateObjectId } from "../middleware/validationMiddleware";
+import {
+    affiliateExists,
+    validateAffiliateUpdateData,
+} from "../middleware/affiliatesMiddleware";
 
 const router = Router();
 
+router.use(authenticate);
+router.param("affiliateId", validateObjectId);
+router.param("affiliateId", affiliateExists);
+
 router.post(
     "/add-affiliate",
-    authenticate,
-    validateUserData,
+    validateAffiliateData,
     AffiliatesController.addAffiliate
 );
+router.get("/", AffiliatesController.getAffiliates);
+router.get("/:affiliateId", AffiliatesController.getAffiliateById);
+router.put(
+    "/:affiliateId",
+    validateAffiliateUpdateData,
+    AffiliatesController.updateAffiliate
+);
+router.delete("/:affiliateId", AffiliatesController.deleteAffiliate);
 
 export default router;

@@ -1,18 +1,19 @@
 import { Request, Response } from "express";
-import User, { roles } from "../models/User";
 import { hashPassword } from "../utils/auth";
+import Affiliate from "../models/Affiliate";
+import { isManager } from "../types/User";
 
 class AffiliatesController {
     static addAffiliate = async (req: Request, res: Response) => {
         try {
             const { email, password } = req.body;
 
-            if (req.user.role !== roles.manager) {
+            if (!isManager(req.user)) {
                 res.status(403).json({ message: "You are not authorized" });
                 return;
             }
 
-            const affiliateExists = await User.findOne({ email });
+            const affiliateExists = await Affiliate.findOne({ email });
 
             if (affiliateExists) {
                 const error = new Error("Affiliate already exists");
@@ -24,19 +25,112 @@ class AffiliatesController {
             const hashedPassword = await hashPassword(password);
 
             // Create new user
-            const newAffiliate = new User({
+            const newAffiliate = new Affiliate({
                 ...req.body,
                 password: hashedPassword,
-                role: roles.affiliate,
                 manager: req.user._id,
             });
 
-            req.user.affiliates.push(newAffiliate._id);
+            req.user.affiliates.push(newAffiliate._id); // TypeScript now knows req.user is ManagerType
 
             await Promise.allSettled([newAffiliate.save(), req.user.save()]);
 
             res.status(201).json({
                 message: "Affiliate account created successfully",
+            });
+        } catch (error) {
+            console.error("Error:", error);
+            res.status(500).json({ message: "There's been an error" });
+        }
+    };
+
+    static getAffiliates = async (req: Request, res: Response) => {
+        const managerId = req.user._id;
+        try {
+            if (!isManager(req.user)) {
+                res.status(403).json({ message: "You are not authorized" });
+                return;
+            }
+
+            // Get affiliates
+            const affiliates = await Affiliate.find({ manager: managerId });
+
+            res.status(200).json({ affiliates: affiliates });
+        } catch (error) {
+            console.error("Error:", error);
+            res.status(500).json({ message: "There's been an error" });
+        }
+    };
+
+    static getAffiliateById = async (req: Request, res: Response) => {
+        const affiliate = req.affiliate;
+
+        try {
+            if (affiliate.manager.toString() !== req.user._id.toString()) {
+                const error = new Error("Invalid action");
+                res.status(401).json({ error: error.message });
+                return;
+            }
+
+            res.status(200).json({ affiliate: affiliate });
+        } catch (error) {
+            console.error("Error:", error);
+            res.status(500).json({ message: "There's been an error" });
+        }
+    };
+
+    static updateAffiliate = async (req: Request, res: Response) => {
+        const affiliate = req.affiliate;
+
+        try {
+            if (affiliate.manager.toString() !== req.user._id.toString()) {
+                const error = new Error("Invalid action");
+                res.status(401).json({ error: error.message });
+                return;
+            }
+
+            affiliate.name = req.body.name;
+            affiliate.email = req.body.email;
+            affiliate.platform = req.body.platform;
+            affiliate.contractType = req.body.contractType;
+            affiliate.CPA = req.body.CPA;
+            affiliate.RevShare = req.body.RevShare;
+
+            await affiliate.save();
+
+            res.status(200).json({
+                message: "Affiliate updated successfully",
+            });
+        } catch (error) {
+            console.error("Error:", error);
+            res.status(500).json({ message: "There's been an error" });
+        }
+    };
+
+    static deleteAffiliate = async (req: Request, res: Response) => {
+        const affiliate = req.affiliate;
+
+        try {
+            if (affiliate.manager.toString() !== req.user._id.toString()) {
+                const error = new Error("Invalid action");
+                res.status(401).json({ error: error.message });
+                return;
+            }
+
+            if (isManager(req.user)) {
+                req.user.affiliates = req.user.affiliates.filter(
+                    (affiliate) =>
+                        affiliate.toString() !== req.affiliate._id.toString()
+                );
+            }
+
+            await Promise.allSettled([
+                req.affiliate.deleteOne(),
+                req.user.save(),
+            ]);
+
+            res.status(200).json({
+                message: "Affiliate account deleted successfully",
             });
         } catch (error) {
             console.error("Error:", error);
