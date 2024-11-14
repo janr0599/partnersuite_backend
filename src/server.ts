@@ -3,8 +3,10 @@ import dotenv from "dotenv";
 import cors from "cors";
 import morgan from "morgan";
 import { connectDB } from "./config/db";
-import ticketsRoutes from "./routes/ticketsRoutes";
 import { corsConfig } from "./config/cors";
+import TicketsRoutes from "./routes/ticketsRoutes";
+import AuthRoutes from "./routes/authRoutes";
+import AffiliatesRoutes from "./routes/affiliatesRoutes";
 
 dotenv.config();
 
@@ -21,6 +23,8 @@ app.use(morgan("dev"));
 app.use(express.json());
 
 //Routes
-app.use("/api/tickets", ticketsRoutes);
+app.use("/api/tickets", TicketsRoutes);
+app.use("/api/auth", AuthRoutes);
+app.use("/api/affiliates", AffiliatesRoutes);
 
 export default app;
