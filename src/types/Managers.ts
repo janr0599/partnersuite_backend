@@ -11,4 +11,5 @@ export type ManagerType = Document & {
 
 export type UserPayload = {
     id: Types.ObjectId;
+    role: string;
 };

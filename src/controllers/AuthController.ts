@@ -61,7 +61,7 @@ class AuthController {
                 return;
             }
 
-            const token = generateJWT({ id: user.id });
+            const token = generateJWT({ id: user.id, role: user.role });
 
             res.json({ token: token });
         } catch (error) {

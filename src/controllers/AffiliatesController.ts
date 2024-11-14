@@ -53,7 +53,9 @@ class AffiliatesController {
             }
 
             // Get affiliates
-            const affiliates = await Affiliate.find({ manager: managerId });
+            const affiliates = await Affiliate.find({
+                manager: managerId,
+            }).select("-password");
 
             res.status(200).json({ affiliates: affiliates });
         } catch (error) {
@@ -87,6 +89,17 @@ class AffiliatesController {
                 const error = new Error("Invalid action");
                 res.status(401).json({ error: error.message });
                 return;
+            }
+
+            // Check if email is being changed and if the new email already exists
+            if (req.body.email && req.body.email !== affiliate.email) {
+                const emailExists = await Affiliate.findOne({
+                    email: req.body.email,
+                });
+                if (emailExists) {
+                    res.status(400).json({ message: "Email already exists" });
+                    return;
+                }
             }
 
             affiliate.name = req.body.name;

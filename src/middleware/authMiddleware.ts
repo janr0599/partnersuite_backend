@@ -74,9 +74,9 @@ export const authenticate = async (
 
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
         if (typeof decoded === "object" && decoded.id) {
             let user: UserType | null = null;
+
             if (decoded.role === "manager") {
                 user = await Manager.findById(decoded.id);
             } else if (decoded.role === "affiliate") {

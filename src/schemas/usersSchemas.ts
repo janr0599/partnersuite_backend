@@ -30,15 +30,99 @@ export const managerRegistrationSchema = userSchema
         path: ["confirmPassword"], // Specify the path to show the error message
     });
 
-export const affiliateRegistrationSchema = userSchema;
-export const affiliateUpdateSchema = userSchema.pick({
-    name: true,
-    email: true,
-    platform: true,
-    contractType: true,
-    CPA: true,
-    RevShare: true,
-});
+export const affiliateRegistrationSchema = userSchema
+    .pick({
+        name: true,
+        email: true,
+        password: true,
+        confirmPassword: true,
+        platform: true,
+        contractType: true,
+        CPA: true,
+        RevShare: true,
+    })
+    .refine(
+        (data) => {
+            if (data.contractType === "CPA") {
+                return data.CPA !== undefined;
+            }
+            return true;
+        },
+        { message: "CPA is required for CPA contract type", path: ["CPA"] }
+    )
+    .refine(
+        (data) => {
+            if (data.contractType === "RevShare") {
+                return data.RevShare !== undefined;
+            }
+            return true;
+        },
+        {
+            message: "RevShare is required for RevShare contract type",
+            path: ["RevShare"],
+        }
+    )
+    .refine(
+        (data) => {
+            if (data.contractType === "Hybrid") {
+                return data.CPA !== undefined && data.RevShare !== undefined;
+            }
+            return true;
+        },
+        {
+            message:
+                "Both CPA and RevShare are required for Hybrid contract type",
+            path: ["CPA", "RevShare"],
+        }
+    )
+    .refine((data) => data.password === data.confirmPassword, {
+        message: "Passwords do not match",
+        path: ["confirmPassword"], // Specify the path to show the error message
+    });
+
+export const affiliateUpdateSchema = userSchema
+    .pick({
+        name: true,
+        email: true,
+        platform: true,
+        contractType: true,
+        CPA: true,
+        RevShare: true,
+    })
+    .refine(
+        (data) => {
+            if (data.contractType === "CPA") {
+                return data.CPA !== undefined;
+            }
+            return true;
+        },
+        { message: "CPA is required for CPA contract type", path: ["CPA"] }
+    )
+    .refine(
+        (data) => {
+            if (data.contractType === "RevShare") {
+                return data.RevShare !== undefined;
+            }
+            return true;
+        },
+        {
+            message: "RevShare is required for RevShare contract type",
+            path: ["RevShare"],
+        }
+    )
+    .refine(
+        (data) => {
+            if (data.contractType === "Hybrid") {
+                return data.CPA !== undefined && data.RevShare !== undefined;
+            }
+            return true;
+        },
+        {
+            message:
+                "Both CPA and RevShare are required for Hybrid contract type",
+            path: ["CPA", "RevShare"],
+        }
+    );
 
 export const loginSchema = userSchema
     .pick({

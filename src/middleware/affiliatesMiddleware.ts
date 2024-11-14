@@ -19,7 +19,9 @@ export const affiliateExists = async (
     const { affiliateId } = req.params;
 
     try {
-        const affiliate = await Affiliate.findById(affiliateId);
+        const affiliate = await Affiliate.findById(affiliateId).select(
+            "-password"
+        );
         if (!affiliate) {
             res.status(404).json({ message: "Affiliate not found" });
             return;
