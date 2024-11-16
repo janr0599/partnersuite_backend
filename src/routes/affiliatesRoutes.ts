@@ -16,11 +16,7 @@ router.use(authenticate);
 router.param("affiliateId", validateObjectId);
 router.param("affiliateId", affiliateExists);
 
-router.post(
-    "/add-affiliate",
-    validateAffiliateData,
-    AffiliatesController.addAffiliate
-);
+router.post("/", validateAffiliateData, AffiliatesController.addAffiliate);
 router.get("/", AffiliatesController.getAffiliates);
 router.get("/:affiliateId", AffiliatesController.getAffiliateById);
 router.put(
