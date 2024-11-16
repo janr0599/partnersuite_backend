@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import Comment from "../models/Comment";
 import { CommentParams, CommentType } from "../types/Comments";
+import { isManager } from "../types/User";
 
 class CommentsController {
     static createComment = async (
@@ -12,6 +13,13 @@ class CommentsController {
             const comment = new Comment();
             comment.content = content;
             comment.ticket = req.ticket._id;
+            comment.createdBy = req.user._id;
+
+            if (isManager(req.user)) {
+                comment.createdByModel = "Manager";
+            } else {
+                comment.createdByModel = "Affiliate";
+            }
 
             req.ticket.comments.push(comment.id);
 

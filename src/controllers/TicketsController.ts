@@ -1,19 +1,72 @@
 import { Request, Response } from "express";
 import Ticket from "../models/Ticket";
+import Affiliate from "../models/Affiliate";
+import { isAffiliate, isManager } from "../types/User";
+import Manager from "../models/Manager";
 
 class TicketsController {
     static createTicket = async (req: Request, res: Response) => {
-        const ticket = new Ticket(req.body);
+        const affiliateId = req.user._id;
         try {
-            await ticket.save();
+            if (!isAffiliate(req.user)) {
+                const error = new Error("Invalid action");
+                res.status(401).json({ error: error.message });
+                return;
+            }
+
+            const affiliate = await Affiliate.findById(affiliateId).populate(
+                "manager"
+            );
+
+            if (!affiliate) {
+                const error = new Error("Affiliate not found");
+                res.status(404).json({ error: error.message });
+                return;
+            }
+
+            const managerID = affiliate.manager._id;
+
+            const ticket = new Ticket({
+                ...req.body,
+                createdBy: affiliateId,
+                manager: managerID,
+            });
+
+            affiliate.tickets.push(ticket._id);
+
+            Promise.allSettled([affiliate.save(), ticket.save()]);
+
             res.status(201).json({ message: "Ticket created successfully" });
         } catch (error) {
             res.status(500).json({ message: "there's been an error" });
         }
     };
+
     static getTickets = async (req: Request, res: Response) => {
         try {
-            const tickets = await Ticket.find();
+            let query = {};
+
+            if (isManager(req.user)) {
+                // Fetch the manager affiliates
+                const manager = await Manager.findById(req.user.id).populate(
+                    "affiliates"
+                );
+                const affiliateIds = manager.affiliates.map(
+                    (affiliate) => affiliate.id
+                );
+                query = {
+                    createdBy: { $in: affiliateIds },
+                };
+            } else if (isAffiliate(req.user)) {
+                query = {
+                    createdBy: req.user.id,
+                };
+            }
+
+            const tickets = await Ticket.find(query).populate(
+                "createdBy",
+                "-password"
+            );
             res.status(200).json({ tickets: tickets });
         } catch (error) {
             res.status(500).json({ message: "there's been an error" });
@@ -22,15 +75,25 @@ class TicketsController {
 
     static getTicketById = async (req: Request, res: Response) => {
         try {
-            const ticket = await Ticket.findById(req.ticket._id).populate({
-                path: "comments",
-            });
+            const ticket = await Ticket.findById(req.ticket._id)
+                .populate({
+                    path: "comments",
+                    populate: {
+                        path: "createdBy",
+                        select: "-password",
+                    },
+                })
+                .populate({
+                    path: "createdBy",
+                    select: "-password",
+                });
 
             res.status(200).json({ ticket: ticket });
         } catch (error) {
             res.status(500).json({ message: "there's been an error" });
         }
     };
+
     static deleteTicket = async (req: Request, res: Response) => {
         try {
             const ticket = await Ticket.findById(req.ticket._id);

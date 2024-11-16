@@ -37,14 +37,14 @@ const TicketSchema: Schema = new Schema(
             enum: Object.values(ticketStatus),
             default: ticketStatus.OPEN,
         },
-        // createdBy: {
-        //     type: Types.ObjectId,
-        //     ref: "User",
-        // },
-        //manager: {
-        //     type: Types.ObjectId,
-        //     ref: "User",
-        // },
+        createdBy: {
+            type: Types.ObjectId,
+            ref: "Affiliate",
+        },
+        manager: {
+            type: Types.ObjectId,
+            ref: "Manager",
+        },
         comments: [
             {
                 type: Types.ObjectId,

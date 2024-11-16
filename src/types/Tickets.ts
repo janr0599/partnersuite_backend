@@ -10,8 +10,8 @@ export type TicketType = Document & {
     description: string;
     status: TicketStatus;
     category: TicketCategory;
-    // createdBy: Types.ObjectId;
-    // manager: Types.ObjectId;
+    createdBy: Types.ObjectId;
+    manager: Types.ObjectId;
     comments: Types.ObjectId[];
     _id: Types.ObjectId;
 };

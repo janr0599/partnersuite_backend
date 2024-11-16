@@ -34,6 +34,12 @@ const AffiliateSchema = new Schema({
         required: true,
         ref: "Manager",
     },
+    tickets: [
+        {
+            type: Types.ObjectId,
+            ref: "Ticket",
+        },
+    ],
     platform: {
         type: String,
         required: true,
