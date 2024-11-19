@@ -8,6 +8,7 @@ import { validateObjectId } from "../middleware/validationMiddleware";
 import {
     affiliateExists,
     validateAffiliateUpdateData,
+    validateAffiliateUpdateStatusData,
 } from "../middleware/affiliatesMiddleware";
 
 const router = Router();
@@ -23,6 +24,11 @@ router.put(
     "/:affiliateId",
     validateAffiliateUpdateData,
     AffiliatesController.updateAffiliate
+);
+router.patch(
+    "/:affiliateId",
+    validateAffiliateUpdateStatusData,
+    AffiliatesController.updateAffiliateStatus
 );
 router.delete("/:affiliateId", AffiliatesController.deleteAffiliate);
 

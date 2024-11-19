@@ -6,10 +6,12 @@ export type AffiliateType = Document & {
     password: string;
     role: string;
     manager: Types.ObjectId;
+    status: string;
     tickets: Types.ObjectId[];
     platform: string;
     contractType: string;
     CPA?: number;
     RevShare?: number;
+    Baseline?: number;
     _id: Types.ObjectId;
 };

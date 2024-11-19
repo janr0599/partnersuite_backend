@@ -120,6 +120,29 @@ class AffiliatesController {
         }
     };
 
+    static updateAffiliateStatus = async (req: Request, res: Response) => {
+        const affiliate = req.affiliate;
+
+        try {
+            if (affiliate.manager.toString() !== req.user._id.toString()) {
+                const error = new Error("Invalid action");
+                res.status(401).json({ error: error.message });
+                return;
+            }
+
+            affiliate.status = req.body.status;
+
+            await affiliate.save();
+
+            res.status(200).json({
+                message: "Affiliate status updated successfully",
+            });
+        } catch (error) {
+            console.error("Error:", error);
+            res.status(500).json({ message: "There's been an error" });
+        }
+    };
+
     static deleteAffiliate = async (req: Request, res: Response) => {
         const affiliate = req.affiliate;
 

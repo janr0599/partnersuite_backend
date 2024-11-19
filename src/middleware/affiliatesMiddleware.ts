@@ -1,7 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 import Affiliate from "../models/Affiliate";
 import { AffiliateType } from "../types/Affiliates";
-import { affiliateUpdateSchema } from "../schemas/usersSchemas";
+import {
+    affiliateUpdateSchema,
+    affiliateUpdateStatusSchema,
+} from "../schemas/usersSchemas";
 
 declare global {
     namespace Express {
@@ -40,6 +43,20 @@ export const validateAffiliateUpdateData = async (
     next: NextFunction
 ) => {
     const validation = affiliateUpdateSchema.safeParse(req.body);
+    if (!validation.success) {
+        res.status(400).json({ message: validation.error.issues });
+        return;
+    } else {
+        next();
+    }
+};
+
+export const validateAffiliateUpdateStatusData = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    const validation = affiliateUpdateStatusSchema.safeParse(req.body);
     if (!validation.success) {
         res.status(400).json({ message: validation.error.issues });
         return;

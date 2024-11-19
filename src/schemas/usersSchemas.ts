@@ -12,10 +12,12 @@ export const userSchema = z.object({
         .trim()
         .min(8, "Password must be at least 8 characters"),
     confirmPassword: z.string().trim().min(1, "Please confirm your password"),
+    status: z.enum(["active", "inactive"]),
     platform: z.string().trim().min(1, "Platform cannot be empty"),
     contractType: z.enum(["CPA", "RevShare", "Hybrid"]),
     CPA: z.number().optional(),
     RevShare: z.number().optional(),
+    Baseline: z.number().optional(),
 });
 
 export const managerRegistrationSchema = userSchema
@@ -40,6 +42,7 @@ export const affiliateRegistrationSchema = userSchema
         contractType: true,
         CPA: true,
         RevShare: true,
+        Baseline: true,
     })
     .refine(
         (data) => {
@@ -88,11 +91,12 @@ export const affiliateUpdateSchema = userSchema
         contractType: true,
         CPA: true,
         RevShare: true,
+        Baseline: true,
     })
     .refine(
         (data) => {
             if (data.contractType === "CPA") {
-                return data.CPA !== undefined;
+                return data.CPA > 0;
             }
             return true;
         },
@@ -101,7 +105,7 @@ export const affiliateUpdateSchema = userSchema
     .refine(
         (data) => {
             if (data.contractType === "RevShare") {
-                return data.RevShare !== undefined;
+                return data.RevShare > 0;
             }
             return true;
         },
@@ -113,7 +117,7 @@ export const affiliateUpdateSchema = userSchema
     .refine(
         (data) => {
             if (data.contractType === "Hybrid") {
-                return data.CPA !== undefined && data.RevShare !== undefined;
+                return data.CPA > 0 && data.RevShare > 0;
             }
             return true;
         },
@@ -123,6 +127,15 @@ export const affiliateUpdateSchema = userSchema
             path: ["CPA", "RevShare"],
         }
     );
+
+export const affiliateUpdateStatusSchema = userSchema
+    .pick({
+        status: true,
+    })
+    .refine((data) => data.status === "active" || data.status === "inactive", {
+        message: "Status must be active or inactive",
+        path: ["status"],
+    });
 
 export const loginSchema = userSchema
     .pick({

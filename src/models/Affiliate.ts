@@ -7,6 +7,11 @@ export const contractTypes = {
     Hybrid: "Hybrid",
 } as const;
 
+export const affiliateStatuses = {
+    active: "active",
+    inactive: "inactive",
+};
+
 const AffiliateSchema = new Schema({
     name: {
         type: String,
@@ -34,6 +39,11 @@ const AffiliateSchema = new Schema({
         required: true,
         ref: "Manager",
     },
+    status: {
+        type: String,
+        enum: Object.values(affiliateStatuses),
+        default: "active",
+    },
     tickets: [
         {
             type: Types.ObjectId,
@@ -54,12 +64,18 @@ const AffiliateSchema = new Schema({
         required: function () {
             return this.contractType === contractTypes.CPA;
         },
+        default: 0,
     },
     RevShare: {
         type: Number,
         required: function () {
             return this.contractType === contractTypes.RevShare;
         },
+        default: 0,
+    },
+    Baseline: {
+        type: Number,
+        default: 0,
     },
 });
 
