@@ -26,7 +26,7 @@ router.put(
     AffiliatesController.updateAffiliate
 );
 router.patch(
-    "/:affiliateId",
+    "/:affiliateId/status",
     validateAffiliateUpdateStatusData,
     AffiliatesController.updateAffiliateStatus
 );

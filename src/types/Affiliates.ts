@@ -1,4 +1,11 @@
 import { Document, Types } from "mongoose";
+import { affiliateStatuses, contractTypes } from "../models/Affiliate";
+
+export type AffiliateStatus =
+    (typeof affiliateStatuses)[keyof typeof affiliateStatuses];
+
+export type AffiliateContractTypes =
+    (typeof contractTypes)[keyof typeof contractTypes];
 
 export type AffiliateType = Document & {
     name: string;
@@ -6,10 +13,10 @@ export type AffiliateType = Document & {
     password: string;
     role: string;
     manager: Types.ObjectId;
-    status: string;
+    status: AffiliateStatus;
     tickets: Types.ObjectId[];
     platform: string;
-    contractType: string;
+    contractType: AffiliateContractTypes;
     CPA?: number;
     RevShare?: number;
     Baseline?: number;

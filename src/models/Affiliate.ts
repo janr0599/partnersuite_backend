@@ -8,9 +8,9 @@ export const contractTypes = {
 } as const;
 
 export const affiliateStatuses = {
-    active: "active",
-    inactive: "inactive",
-};
+    Active: "active",
+    Inactive: "inactive",
+} as const;
 
 const AffiliateSchema = new Schema({
     name: {
@@ -42,7 +42,7 @@ const AffiliateSchema = new Schema({
     status: {
         type: String,
         enum: Object.values(affiliateStatuses),
-        default: "active",
+        default: affiliateStatuses.Active,
     },
     tickets: [
         {
