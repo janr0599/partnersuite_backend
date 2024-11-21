@@ -94,6 +94,36 @@ class TicketsController {
         }
     };
 
+    static updateTicket = async (req: Request, res: Response) => {
+        try {
+            if (!isAffiliate(req.user)) {
+                const error = new Error("Invalid action");
+                res.status(401).json({ error: error.message });
+                return;
+            }
+
+            const isAuthorized =
+                req.ticket.createdBy.toString() === req.user._id.toString();
+
+            if (!isAuthorized) {
+                const error = new Error("Not authorized");
+                res.status(401).json({ error: error.message });
+                return;
+            }
+
+            req.ticket.title = req.body.title;
+            req.ticket.description = req.body.description;
+            req.ticket.category = req.body.category;
+
+            await req.ticket.save();
+            res.status(200).json({
+                message: "Ticket updated successfully",
+            });
+        } catch (error) {
+            res.status(500).json({ message: "there's been an error" });
+        }
+    };
+
     static deleteTicket = async (req: Request, res: Response) => {
         try {
             const ticket = await Ticket.findById(req.ticket._id);

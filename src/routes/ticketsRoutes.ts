@@ -18,6 +18,7 @@ router.param("ticketId", validateTicketExists);
 router.post("/", validateTicketData, TicketsController.createTicket);
 router.get("/", TicketsController.getTickets);
 router.get("/:ticketId", TicketsController.getTicketById);
+router.put("/:ticketId", validateTicketData, TicketsController.updateTicket);
 router.patch("/:ticketId", TicketsController.updateTicketStatus);
 router.delete("/:ticketId", TicketsController.deleteTicket);
 
