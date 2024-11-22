@@ -50,6 +50,12 @@ const AffiliateSchema = new Schema({
             ref: "Ticket",
         },
     ],
+    topUpRequests: [
+        {
+            type: Types.ObjectId,
+            ref: "TopUpRequest",
+        },
+    ],
     platform: {
         type: String,
         required: true,
@@ -58,6 +64,10 @@ const AffiliateSchema = new Schema({
         type: String,
         required: true,
         enum: Object.values(contractTypes),
+    },
+    BonusAmount: {
+        type: Number,
+        default: 0,
     },
     CPA: {
         type: Number,

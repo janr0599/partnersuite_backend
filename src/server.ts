@@ -7,6 +7,7 @@ import { corsConfig } from "./config/cors";
 import TicketsRoutes from "./routes/ticketsRoutes";
 import AuthRoutes from "./routes/authRoutes";
 import AffiliatesRoutes from "./routes/affiliatesRoutes";
+import TopUpRequestsRoutes from "./routes/topUpRequestsRoutes";
 
 dotenv.config();
 
@@ -26,5 +27,6 @@ app.use(express.json());
 app.use("/api/tickets", TicketsRoutes);
 app.use("/api/auth", AuthRoutes);
 app.use("/api/affiliates", AffiliatesRoutes);
+app.use("/api/topUpRequests", TopUpRequestsRoutes);
 
 export default app;

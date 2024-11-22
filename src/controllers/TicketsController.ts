@@ -62,7 +62,7 @@ class TicketsController {
                     createdBy: req.user.id,
                 };
             }
-
+            console.log(query);
             const tickets = await Ticket.find(query).populate(
                 "createdBy",
                 "-password"
