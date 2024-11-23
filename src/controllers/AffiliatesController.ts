@@ -106,6 +106,7 @@ class AffiliatesController {
             affiliate.email = req.body.email;
             affiliate.platform = req.body.platform;
             affiliate.contractType = req.body.contractType;
+            affiliate.BonusAmount = req.body.BonusAmount;
             affiliate.CPA = req.body.CPA;
             affiliate.RevShare = req.body.RevShare;
 

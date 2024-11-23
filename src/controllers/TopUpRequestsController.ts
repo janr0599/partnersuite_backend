@@ -1,11 +1,14 @@
 import { Request, Response } from "express";
 // import { TopUpRequestType } from "../types/TopUpRequests";
 import TopUpRequest from "../models/TopUpRequest";
-// import { TopUpRequestParams } from "../types/TopUpRequests";
 // import { TopUpRequestStatus } from "../models/TopUpRequest";
 import { isAffiliate, isManager } from "../types/User";
 import Manager from "../models/Manager";
 import Affiliate from "../models/Affiliate";
+import {
+    TopUpRequestParams,
+    TopUpRequestStatusType,
+} from "../types/TopUpRequests";
 
 class TopUpRequestsController {
     static createTopUpRequest = async (req: Request, res: Response) => {
@@ -13,7 +16,7 @@ class TopUpRequestsController {
         try {
             if (!isAffiliate(req.user)) {
                 const error = new Error("Invalid action");
-                res.status(401).json({ error: error.message });
+                res.status(401).json({ message: error.message });
                 return;
             }
 
@@ -21,7 +24,7 @@ class TopUpRequestsController {
 
             if (!affiliate) {
                 const error = new Error("Affiliate not found");
-                res.status(404).json({ error: error.message });
+                res.status(404).json({ message: error.message });
                 return;
             }
 
@@ -74,29 +77,83 @@ class TopUpRequestsController {
         }
     };
 
-    // static deleteTopUpRequest = async (req: Request, res: Response) => {
-    //     const topUpRequest = req.topUpRequest;
+    static deleteTopUpRequest = async (
+        req: Request<TopUpRequestParams, {}, {}>,
+        res: Response
+    ) => {
+        const topUpRequestId = req.topUpRequest.id;
 
-    //     try {
-    //         if (topUpRequest.createdBy.toString() !== req.user._id.toString()) {
-    //             const error = new Error("Invalid action");
-    //             res.status(401).json({ error: error.message });
-    //             return;
-    //         }
+        try {
+            if (!isAffiliate(req.user)) {
+                const error = new Error("Invalid action");
+                res.status(401).json({ message: error.message });
+                return;
+            }
 
-    //         await Promise.allSettled([
-    //             req.topUpRequest.deleteOne(),
-    //             req.user.save(),
-    //         ]);
+            if (
+                req.topUpRequest.createdBy.toString() !==
+                req.user._id.toString()
+            ) {
+                const error = new Error("not authorized");
+                res.status(401).json({ message: error.message });
+                return;
+            }
 
-    //         res.status(200).json({
-    //             message: "Top-up request deleted successfully",
-    //         });
-    //     } catch (error) {
-    //         console.error("Error:", error);
-    //         res.status(500).json({ message: "There's been an error" });
-    //     }
-    // };
+            const affiliate = req.user;
+            affiliate.topUpRequests.filter(
+                (topUpRequest) => topUpRequest._id.toString() !== topUpRequestId
+            );
+
+            await Promise.allSettled([
+                req.topUpRequest.deleteOne(),
+                affiliate.save(),
+            ]);
+
+            res.status(200).json({
+                message: "Top-up request deleted successfully",
+            });
+        } catch (error) {
+            console.error("Error:", error);
+            res.status(500).json({ message: "There's been an error" });
+        }
+    };
+
+    static updateTopUpRequestStatus = async (
+        req: Request<TopUpRequestParams, {}, TopUpRequestStatusType>,
+        res: Response
+    ) => {
+        const affiliateId = req.topUpRequest.createdBy;
+        const topUpRequestId = req.topUpRequest._id;
+
+        try {
+            if (!isManager(req.user)) {
+                const error = new Error("Invalid action");
+                res.status(401).json({ message: error.message });
+                return;
+            }
+
+            const affiliate = await Affiliate.findById(affiliateId);
+
+            const isAuthorized =
+                affiliate.manager.toString() === req.user._id.toString();
+            if (!isAuthorized) {
+                const error = new Error("Not authorized");
+                res.status(401).json({ message: error.message });
+                return;
+            }
+
+            const topUpRequest = await TopUpRequest.findById(topUpRequestId);
+            topUpRequest.status = req.body.status;
+            await topUpRequest.save();
+
+            res.status(200).json({
+                message: "Top-up request status updated successfully",
+            });
+        } catch (error) {
+            console.error("Error:", error);
+            res.status(500).json({ message: "There's been an error" });
+        }
+    };
 }
 
 export default TopUpRequestsController;

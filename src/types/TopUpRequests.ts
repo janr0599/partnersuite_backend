@@ -6,8 +6,13 @@ export type TopUpRequestStatus =
 
 export type TopUpRequestType = Document & {
     createdBy: Types.ObjectId;
+    BonusAmount: number;
     status: TopUpRequestStatus;
     _id: Types.ObjectId;
+};
+
+export type TopUpRequestStatusType = {
+    status: TopUpRequestStatus;
 };
 
 export type TopUpRequestParams = {
