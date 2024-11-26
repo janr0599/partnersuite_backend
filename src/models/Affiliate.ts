@@ -65,6 +65,10 @@ const AffiliateSchema = new Schema({
         required: true,
         enum: Object.values(contractTypes),
     },
+    country: {
+        type: String,
+        required: true,
+    },
     BonusAmount: {
         type: Number,
         default: 0,

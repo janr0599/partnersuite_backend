@@ -51,6 +51,10 @@ const TicketSchema: Schema = new Schema(
                 ref: "Comment",
             },
         ],
+        closedAt: {
+            type: Date,
+            default: null,
+        },
     },
     { timestamps: true }
 );

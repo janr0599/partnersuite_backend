@@ -18,6 +18,7 @@ export type AffiliateType = Document & {
     topUpRequests: Types.ObjectId[];
     platform: string;
     contractType: AffiliateContractTypes;
+    country: string;
     BonusAmount?: number;
     CPA?: number;
     RevShare?: number;

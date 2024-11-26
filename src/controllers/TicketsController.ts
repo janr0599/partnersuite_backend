@@ -3,6 +3,7 @@ import Ticket from "../models/Ticket";
 import Affiliate from "../models/Affiliate";
 import { isAffiliate, isManager } from "../types/User";
 import Manager from "../models/Manager";
+import { subDays, startOfDay, endOfDay } from "date-fns";
 
 class TicketsController {
     static createTicket = async (req: Request, res: Response) => {
@@ -67,6 +68,20 @@ class TicketsController {
                 "createdBy",
                 "-password"
             );
+            res.status(200).json({ tickets: tickets });
+        } catch (error) {
+            res.status(500).json({ message: "there's been an error" });
+        }
+    };
+
+    static getPreviousDayTickets = async (req: Request, res: Response) => {
+        try {
+            const previousDay = subDays(new Date(), 1);
+            const start = startOfDay(previousDay);
+            const end = endOfDay(previousDay);
+            const tickets = await Ticket.find({
+                createdAt: { $gte: start, $lte: end },
+            });
             res.status(200).json({ tickets: tickets });
         } catch (error) {
             res.status(500).json({ message: "there's been an error" });
@@ -138,6 +153,9 @@ class TicketsController {
         try {
             const ticket = await Ticket.findById(req.ticket._id);
             ticket.status = req.body.status;
+            if (req.body.status === "closed") {
+                ticket.closedAt = new Date();
+            }
             await ticket.save();
             res.status(200).json({
                 message: "Ticket status updated successfully",

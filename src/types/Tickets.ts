@@ -13,5 +13,6 @@ export type TicketType = Document & {
     createdBy: Types.ObjectId;
     manager: Types.ObjectId;
     comments: Types.ObjectId[];
+    closedAt: Date | null;
     _id: Types.ObjectId;
 };
