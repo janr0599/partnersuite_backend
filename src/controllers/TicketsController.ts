@@ -88,6 +88,39 @@ class TicketsController {
         }
     };
 
+    static getLatestTickets = async (req: Request, res: Response) => {
+        try {
+            let query = {};
+
+            if (!isManager(req.user)) {
+                const error = new Error("Invalid action");
+                res.status(401).json({ error: error.message });
+                return;
+            }
+
+            // Fetch the manager affiliates
+            const manager = await Manager.findById(req.user.id).populate(
+                "affiliates"
+            );
+            const affiliateIds = manager.affiliates.map(
+                (affiliate) => affiliate.id
+            );
+            query = {
+                status: { $in: ["open"] },
+                createdBy: { $in: affiliateIds },
+            };
+
+            const tickets = await Ticket.find(query).populate(
+                "createdBy",
+                "-password"
+            );
+
+            res.status(200).json({ tickets: tickets });
+        } catch (error) {
+            res.status(500).json({ message: "there's been an error" });
+        }
+    };
+
     static getTicketById = async (req: Request, res: Response) => {
         try {
             const ticket = await Ticket.findById(req.ticket._id)
