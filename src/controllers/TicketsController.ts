@@ -110,10 +110,9 @@ class TicketsController {
                 createdBy: { $in: affiliateIds },
             };
 
-            const tickets = await Ticket.find(query).populate(
-                "createdBy",
-                "-password"
-            );
+            const tickets = await Ticket.find(query)
+                .limit(5)
+                .populate("createdBy", "-password");
 
             res.status(200).json({ tickets: tickets });
         } catch (error) {
