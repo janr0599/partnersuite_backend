@@ -1,14 +1,14 @@
 import { Request, Response } from "express";
-// import { TopUpRequestType } from "../types/TopUpRequests";
 import TopUpRequest from "../models/TopUpRequest";
-// import { TopUpRequestStatus } from "../models/TopUpRequest";
 import { isAffiliate, isManager } from "../types/User";
 import Manager from "../models/Manager";
 import Affiliate from "../models/Affiliate";
 import {
     TopUpRequestParams,
     TopUpRequestStatusType,
+    TopUpRequestType,
 } from "../types/TopUpRequests";
+import { AffiliateType } from "../types/Affiliates";
 
 class TopUpRequestsController {
     static createTopUpRequest = async (req: Request, res: Response) => {
@@ -20,11 +20,26 @@ class TopUpRequestsController {
                 return;
             }
 
-            const affiliate = await Affiliate.findById(affiliateId);
+            const affiliate = await Affiliate.findById(affiliateId).populate(
+                "topUpRequests"
+            );
+            const topUpRequests = affiliate.topUpRequests as TopUpRequestType[];
 
             if (!affiliate) {
                 const error = new Error("Affiliate not found");
                 res.status(404).json({ message: error.message });
+                return;
+            }
+
+            const pendingTopUpRequest = topUpRequests.find(
+                (topUpRequest) => topUpRequest.status === "Pending"
+            );
+
+            if (pendingTopUpRequest) {
+                const error = new Error(
+                    "You already have a pending top-up request, please wait for it to be approved or rejected"
+                );
+                res.status(400).json({ message: error.message });
                 return;
             }
 

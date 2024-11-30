@@ -1,5 +1,6 @@
 import { Document, Types } from "mongoose";
 import { affiliateStatuses, contractTypes } from "../models/Affiliate";
+import { TopUpRequestType } from "./TopUpRequests";
 
 export type AffiliateStatus =
     (typeof affiliateStatuses)[keyof typeof affiliateStatuses];
@@ -15,7 +16,7 @@ export type AffiliateType = Document & {
     manager: Types.ObjectId;
     status: AffiliateStatus;
     tickets: Types.ObjectId[];
-    topUpRequests: Types.ObjectId[];
+    topUpRequests: (Types.ObjectId | TopUpRequestType)[];
     platform: string;
     contractType: AffiliateContractTypes;
     country: string;
