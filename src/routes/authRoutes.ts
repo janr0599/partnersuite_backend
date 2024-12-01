@@ -14,6 +14,7 @@ router.post(
     AuthController.createAccount
 );
 router.post("/login", validateLogin, AuthController.login);
+router.post("/login-affiliate", authenticate, AuthController.login);
 router.get("/user", authenticate, AuthController.user);
 
 export default router;

@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { hashPassword } from "../utils/auth";
 import Affiliate from "../models/Affiliate";
 import { isManager } from "../types/User";
+import { NotificationEmail } from "../emails/NotificationsEmail";
 
 class AffiliatesController {
     static addAffiliate = async (req: Request, res: Response) => {
@@ -34,6 +35,12 @@ class AffiliatesController {
             req.user.affiliates.push(newAffiliate._id); // TypeScript now knows req.user is ManagerType
 
             await Promise.allSettled([newAffiliate.save(), req.user.save()]);
+
+            // Send notification email
+            NotificationEmail.affiliateAccountCreatedEmail({
+                email: newAffiliate.email,
+                name: newAffiliate.name,
+            });
 
             res.status(201).json({
                 message: "Affiliate account created successfully",

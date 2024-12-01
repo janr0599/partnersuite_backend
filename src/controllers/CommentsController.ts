@@ -2,7 +2,10 @@ import { Request, Response } from "express";
 import Comment from "../models/Comment";
 import { CommentParams, CommentType } from "../types/Comments";
 import { isManager } from "../types/User";
-import { sendNotificationEmail } from "../emails/NotificationsEmail";
+import { NotificationEmail } from "../emails/NotificationsEmail";
+import Affiliate from "../models/Affiliate";
+import Manager from "../models/Manager";
+import Ticket from "../models/Ticket";
 
 class CommentsController {
     static createComment = async (
@@ -10,23 +13,61 @@ class CommentsController {
         res: Response
     ) => {
         const { content } = req.body;
+
         try {
             const comment = new Comment();
             comment.content = content;
             comment.ticket = req.ticket._id;
             comment.createdBy = req.user._id;
 
+            let recipientEmail = "";
+            let recipientName = "";
+            let affiliateName = "";
+            let role = "";
+
             if (isManager(req.user)) {
                 comment.createdByModel = "Manager";
+                // Find the affiliate associated with this ticket or comment
+                const affiliate = await Affiliate.findById(
+                    req.ticket.createdBy
+                );
+                if (affiliate) {
+                    recipientEmail = affiliate.email;
+                    recipientName = affiliate.name;
+                    role = "Manager";
+                }
             } else {
                 comment.createdByModel = "Affiliate";
+                // Find the manager of the affiliate
+                const manager = await Manager.findById(req.user.manager);
+                if (manager) {
+                    // Find the affiliate associated with this ticket or comment
+                    const affiliate = await Affiliate.findById(
+                        req.ticket.createdBy
+                    );
+                    recipientEmail = manager.email;
+                    recipientName = manager.name;
+                    affiliateName = affiliate.name;
+                    role = "Affiliate";
+                    console.log(affiliate);
+                }
             }
 
             req.ticket.comments.push(comment.id);
 
             await Promise.allSettled([req.ticket.save(), comment.save()]);
 
-            sendNotificationEmail();
+            if (recipientEmail) {
+                NotificationEmail.newCommentEmail({
+                    email: recipientEmail,
+                    name: recipientName,
+                    affiliateName,
+                    role,
+                    ticketId: req.ticket.id,
+                });
+            } else {
+                console.warn("Recipient email not found.");
+            }
 
             res.status(201).json({ message: "Comment created successfully" });
         } catch (error) {

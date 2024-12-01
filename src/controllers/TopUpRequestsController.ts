@@ -9,6 +9,7 @@ import {
     TopUpRequestType,
 } from "../types/TopUpRequests";
 import { AffiliateType } from "../types/Affiliates";
+import { NotificationEmail } from "../emails/NotificationsEmail";
 
 class TopUpRequestsController {
     static createTopUpRequest = async (req: Request, res: Response) => {
@@ -81,10 +82,9 @@ class TopUpRequestsController {
                 };
             }
 
-            const topUpRequests = await TopUpRequest.find(query).populate(
-                "createdBy",
-                "_id name role email"
-            );
+            const topUpRequests = await TopUpRequest.find(query)
+                .populate("createdBy", "_id name role email")
+                .sort({ createdAt: "desc" });
             res.status(200).json({ topUpRequests: topUpRequests });
         } catch (error) {
             console.error("Error fetching top-up requests:", error.message);
@@ -160,6 +160,13 @@ class TopUpRequestsController {
             const topUpRequest = await TopUpRequest.findById(topUpRequestId);
             topUpRequest.status = req.body.status;
             await topUpRequest.save();
+
+            //send notification email
+            NotificationEmail.topUpRequestUpdatedEmail({
+                email: affiliate.email,
+                name: affiliate.name,
+                topUpRequestStatus: topUpRequest.status,
+            });
 
             res.status(200).json({
                 message: "Top-up request status updated successfully",
