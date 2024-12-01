@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import Comment from "../models/Comment";
 import { CommentParams, CommentType } from "../types/Comments";
 import { isManager } from "../types/User";
+import { sendNotificationEmail } from "../emails/NotificationsEmail";
 
 class CommentsController {
     static createComment = async (
@@ -24,6 +25,9 @@ class CommentsController {
             req.ticket.comments.push(comment.id);
 
             await Promise.allSettled([req.ticket.save(), comment.save()]);
+
+            sendNotificationEmail();
+
             res.status(201).json({ message: "Comment created successfully" });
         } catch (error) {
             res.status(500).json({ message: "there's been an error" });

@@ -64,10 +64,9 @@ class TicketsController {
                 };
             }
             console.log(query);
-            const tickets = await Ticket.find(query).populate(
-                "createdBy",
-                "-password"
-            );
+            const tickets = await Ticket.find(query)
+                .populate("createdBy", "-password")
+                .sort({ createdAt: "desc" });
             res.status(200).json({ tickets: tickets });
         } catch (error) {
             res.status(500).json({ message: "there's been an error" });
@@ -112,7 +111,8 @@ class TicketsController {
 
             const tickets = await Ticket.find(query)
                 .limit(5)
-                .populate("createdBy", "-password");
+                .populate("createdBy", "-password")
+                .sort({ createdAt: "desc" });
 
             res.status(200).json({ tickets: tickets });
         } catch (error) {
