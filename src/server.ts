@@ -9,6 +9,7 @@ import AuthRoutes from "./routes/authRoutes";
 import AffiliatesRoutes from "./routes/affiliatesRoutes";
 import TopUpRequestsRoutes from "./routes/topUpRequestsRoutes";
 import ProfileRoutes from "./routes/profileRoutes";
+import NotificationsRoutes from "./routes/notificationsRoutes";
 
 dotenv.config();
 
@@ -30,5 +31,6 @@ app.use("/api/auth", AuthRoutes);
 app.use("/api/affiliates", AffiliatesRoutes);
 app.use("/api/topUpRequests", TopUpRequestsRoutes);
 app.use("/api/profile", ProfileRoutes);
+app.use("/api/notifications", NotificationsRoutes);
 
 export default app;

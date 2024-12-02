@@ -5,7 +5,7 @@ import { isManager } from "../types/User";
 import { NotificationEmail } from "../emails/NotificationsEmail";
 import Affiliate from "../models/Affiliate";
 import Manager from "../models/Manager";
-import Ticket from "../models/Ticket";
+import Notification, { notificationStatus } from "../models/Notification";
 
 class CommentsController {
     static createComment = async (
@@ -20,10 +20,13 @@ class CommentsController {
             comment.ticket = req.ticket._id;
             comment.createdBy = req.user._id;
 
+            // Email Notification
             let recipientEmail = "";
             let recipientName = "";
             let affiliateName = "";
             let role = "";
+            let recipientId;
+            let recipientModel;
 
             if (isManager(req.user)) {
                 comment.createdByModel = "Manager";
@@ -35,6 +38,8 @@ class CommentsController {
                     recipientEmail = affiliate.email;
                     recipientName = affiliate.name;
                     role = "Manager";
+                    recipientId = affiliate._id;
+                    recipientModel = "Affiliate";
                 }
             } else {
                 comment.createdByModel = "Affiliate";
@@ -49,7 +54,8 @@ class CommentsController {
                     recipientName = manager.name;
                     affiliateName = affiliate.name;
                     role = "Affiliate";
-                    console.log(affiliate);
+                    recipientId = manager._id;
+                    recipientModel = "Manager";
                 }
             }
 
@@ -57,6 +63,7 @@ class CommentsController {
 
             await Promise.allSettled([req.ticket.save(), comment.save()]);
 
+            // Send email notification
             if (recipientEmail) {
                 NotificationEmail.newCommentEmail({
                     email: recipientEmail,
@@ -67,6 +74,27 @@ class CommentsController {
                 });
             } else {
                 console.warn("Recipient email not found.");
+            }
+
+            // Create and save frontend notification
+            if (recipientId && recipientModel) {
+                const affiliate = await Affiliate.findById(
+                    req.ticket.createdBy
+                );
+                const notification = new Notification({
+                    message: `${
+                        isManager(req.user)
+                            ? `A new comment has been added to your ticket.`
+                            : `${affiliate.name} has added a new comment to their ticket.`
+                    }`,
+                    recipient: recipientId,
+                    recipientModel,
+                    status: notificationStatus.UNREAD,
+                    link: `${process.env.FRONTEND_URL}/tickets?viewTicket=${req.ticket.id}`,
+                });
+                await notification.save();
+            } else {
+                console.warn("Recipient not found for notification.");
             }
 
             res.status(201).json({ message: "Comment created successfully" });

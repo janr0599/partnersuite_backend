@@ -8,8 +8,8 @@ import {
     TopUpRequestStatusType,
     TopUpRequestType,
 } from "../types/TopUpRequests";
-import { AffiliateType } from "../types/Affiliates";
 import { NotificationEmail } from "../emails/NotificationsEmail";
+import Notification, { notificationStatus } from "../models/Notification";
 
 class TopUpRequestsController {
     static createTopUpRequest = async (req: Request, res: Response) => {
@@ -167,6 +167,20 @@ class TopUpRequestsController {
                 name: affiliate.name,
                 topUpRequestStatus: topUpRequest.status,
             });
+
+            // create frontend notification
+            if (affiliate) {
+                const notification = new Notification({
+                    message: `Your top up request has been ${topUpRequest.status}`,
+                    recipient: affiliateId,
+                    recipientModel: "Affiliate",
+                    status: notificationStatus.UNREAD,
+                    link: `${process.env.FRONTEND_URL}/top-up-requests`,
+                });
+                await notification.save();
+            } else {
+                console.warn("Affiliate not found for notification.");
+            }
 
             res.status(200).json({
                 message: "Top-up request status updated successfully",

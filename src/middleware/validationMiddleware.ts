@@ -6,9 +6,10 @@ export const validateObjectId = (
     res: Response,
     next: NextFunction
 ) => {
-    const { ticketId, commentId, affiliateId, topUpRequestId } = req.params;
+    const { ticketId, commentId, affiliateId, topUpRequestId, notificationId } =
+        req.params;
     const validation = objectIdSchema.safeParse(
-        ticketId || commentId || affiliateId || topUpRequestId
+        ticketId || commentId || affiliateId || topUpRequestId || notificationId
     );
 
     if (!validation.success) {
