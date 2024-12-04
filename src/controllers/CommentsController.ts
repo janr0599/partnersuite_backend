@@ -90,7 +90,7 @@ class CommentsController {
                     recipient: recipientId,
                     recipientModel,
                     status: notificationStatus.UNREAD,
-                    link: `${process.env.FRONTEND_URL}/tickets?viewTicket=${req.ticket.id}`,
+                    link: `?viewTicket=${req.ticket.id}`,
                 });
                 await notification.save();
             } else {

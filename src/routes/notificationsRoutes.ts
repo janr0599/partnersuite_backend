@@ -7,10 +7,11 @@ const router = Router();
 router.use(authenticate);
 
 router.get("/", NotificationsController.getNotifications);
-router.patch(
+router.post(
     "/:notificationId",
     validateObjectId,
-    NotificationsController.updateNotificationStatus
+    NotificationsController.markNotificationAsRead
 );
+router.post("/", NotificationsController.markAllNotificationsAsRead);
 
 export default router;

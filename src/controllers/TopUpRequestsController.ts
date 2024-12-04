@@ -175,7 +175,7 @@ class TopUpRequestsController {
                     recipient: affiliateId,
                     recipientModel: "Affiliate",
                     status: notificationStatus.UNREAD,
-                    link: `${process.env.FRONTEND_URL}/top-up-requests`,
+                    link: "/top-up-requests",
                 });
                 await notification.save();
             } else {
