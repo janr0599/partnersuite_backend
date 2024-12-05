@@ -7,7 +7,10 @@ import {
     affiliateRegistrationSchema,
     loginSchema,
     managerRegistrationSchema,
+    requestCodeSchema,
+    resetPasswordSchema,
 } from "../schemas/usersSchemas";
+import { tokenSchema } from "../schemas/validationSchemas";
 
 declare global {
     namespace Express {
@@ -51,6 +54,38 @@ export const validateLogin = (
     next: NextFunction
 ) => {
     const validation = loginSchema.safeParse(req.body);
+    if (!validation.success) {
+        res.status(400).json({ error: validation.error.issues });
+    } else {
+        next();
+    }
+};
+
+export const validateEmail = (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    const validation = requestCodeSchema.safeParse(req.body);
+    if (!validation.success) {
+        res.status(400).json({ error: validation.error.issues });
+    } else {
+        next();
+    }
+};
+
+export const validateNewPassword = (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    const { token } = req.params;
+    const tokenValidation = tokenSchema.safeParse(token);
+    if (!tokenValidation.success) {
+        res.status(400).json({ error: tokenValidation.error.issues });
+    }
+
+    const validation = resetPasswordSchema.safeParse(req.body);
     if (!validation.success) {
         res.status(400).json({ error: validation.error.issues });
     } else {

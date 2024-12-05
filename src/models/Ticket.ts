@@ -17,6 +17,11 @@ export const ticketCategory = {
 
 const TicketSchema: Schema = new Schema(
     {
+        ticketId: {
+            type: String,
+            unique: true,
+            required: true,
+        },
         title: {
             type: String,
             trim: true,

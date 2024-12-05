@@ -9,7 +9,10 @@ import {
     TopUpRequestType,
 } from "../types/TopUpRequests";
 import { NotificationEmail } from "../emails/NotificationsEmail";
-import Notification, { notificationStatus } from "../models/Notification";
+import Notification, {
+    notificationStatus,
+    notificationTypes,
+} from "../models/Notification";
 
 class TopUpRequestsController {
     static createTopUpRequest = async (req: Request, res: Response) => {
@@ -175,6 +178,7 @@ class TopUpRequestsController {
                     recipient: affiliateId,
                     recipientModel: "Affiliate",
                     status: notificationStatus.UNREAD,
+                    type: notificationTypes.TOP_UP_REQUEST,
                     link: "/top-up-requests",
                 });
                 await notification.save();

@@ -4,6 +4,7 @@ import Affiliate from "../models/Affiliate";
 import { isAffiliate, isManager } from "../types/User";
 import Manager from "../models/Manager";
 import { subDays, startOfDay, endOfDay } from "date-fns";
+import { v4 as uuidv4 } from "uuid";
 
 class TicketsController {
     static createTicket = async (req: Request, res: Response) => {
@@ -31,6 +32,7 @@ class TicketsController {
                 ...req.body,
                 createdBy: affiliateId,
                 manager: managerID,
+                ticketId: `T-${uuidv4().slice(0, 8)}`, // Generate unique ticket ID
             });
 
             affiliate.tickets.push(ticket._id);

@@ -6,6 +6,7 @@ export type TicketCategory =
     (typeof ticketCategory)[keyof typeof ticketCategory];
 
 export type TicketType = Document & {
+    ticketId: string;
     title: string;
     description: string;
     status: TicketStatus;

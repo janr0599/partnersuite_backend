@@ -6,6 +6,11 @@ export const notificationStatus = {
     UNREAD: "unread",
 } as const;
 
+export const notificationTypes = {
+    TOP_UP_REQUEST: "topUpRequest",
+    TICKET_COMMENT: "ticketComment",
+} as const;
+
 const notificationSchema = new Schema(
     {
         message: {
@@ -26,6 +31,11 @@ const notificationSchema = new Schema(
             type: String,
             enum: Object.values(notificationStatus),
             default: notificationStatus.UNREAD,
+        },
+        type: {
+            type: String,
+            required: true,
+            enum: Object.values(notificationTypes),
         },
         link: {
             type: String,

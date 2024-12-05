@@ -149,3 +149,19 @@ export const loginSchema = userSchema
     .extend({
         password: z.string().trim().min(1, "Password is required"),
     });
+
+// Request code schema
+export const requestCodeSchema = userSchema.pick({
+    email: true,
+});
+
+// Reset password schema
+export const resetPasswordSchema = userSchema
+    .pick({
+        password: true,
+        confirmPassword: true,
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+        message: "Passwords do not match",
+        path: ["confirmPassword"],
+    });

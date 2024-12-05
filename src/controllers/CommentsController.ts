@@ -5,7 +5,10 @@ import { isManager } from "../types/User";
 import { NotificationEmail } from "../emails/NotificationsEmail";
 import Affiliate from "../models/Affiliate";
 import Manager from "../models/Manager";
-import Notification, { notificationStatus } from "../models/Notification";
+import Notification, {
+    notificationStatus,
+    notificationTypes,
+} from "../models/Notification";
 
 class CommentsController {
     static createComment = async (
@@ -90,6 +93,7 @@ class CommentsController {
                     recipient: recipientId,
                     recipientModel,
                     status: notificationStatus.UNREAD,
+                    type: notificationTypes.TICKET_COMMENT,
                     link: `?viewTicket=${req.ticket.id}`,
                 });
                 await notification.save();
