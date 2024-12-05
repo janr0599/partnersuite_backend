@@ -1,5 +1,6 @@
 import { Schema, model, Types } from "mongoose";
 import { TicketType } from "../types/Tickets";
+import Comment from "./Comment";
 
 export const ticketStatus = {
     OPEN: "open",
@@ -63,6 +64,13 @@ const TicketSchema: Schema = new Schema(
     },
     { timestamps: true }
 );
+
+// Middleware to delete ticket comments when ticket is deleted
+TicketSchema.pre("deleteOne", { document: true }, async function () {
+    const ticketId = this._id;
+    if (!ticketId) return;
+    await Comment.deleteMany({ ticket: ticketId });
+});
 
 const Ticket = model<TicketType>("Ticket", TicketSchema);
 export default Ticket;

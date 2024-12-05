@@ -3,7 +3,6 @@ import colors from "colors";
 import dotenv from "dotenv";
 
 dotenv.config();
-console.log(brevo); // Add this to inspect the module exports
 
 // Verify that the environment variable is set
 if (!process.env.TRANSACTIONAL_EMAILS_API_KEY) {
@@ -34,8 +33,6 @@ export class NotificationEmail {
         data: NotificationEmailProps
     ) => {
         try {
-            console.log(colors.green("Sending email..."));
-
             const sendSmtpEmail = new brevo.SendSmtpEmail();
             sendSmtpEmail.subject = "PartnerSuite Notification";
             sendSmtpEmail.htmlContent = `<h2>Account Created</h2> <p>Hi, ${data.name}.</p> <p>A new PartnerSuite account has been created for you.</p> <strong> <a href="${process.env.FRONTEND_URL}/auth/login-affiliate">Login here</a> </strong> <br /> <p>Cheers,</p> <p>PartnerSuite Team</p>`;
@@ -46,7 +43,6 @@ export class NotificationEmail {
             };
 
             const response = await apiInstance.sendTransacEmail(sendSmtpEmail);
-            console.log(colors.green("Email sent successfully:"), response);
         } catch (error) {
             console.error(colors.red("Error sending email:"), error);
         }
@@ -54,8 +50,6 @@ export class NotificationEmail {
 
     static newCommentEmail = async (data: NotificationEmailProps) => {
         try {
-            console.log(colors.green("Sending email..."));
-
             const sendSmtpEmail = new brevo.SendSmtpEmail();
             sendSmtpEmail.subject = "PartnerSuite Notification";
             sendSmtpEmail.htmlContent = `<h2>New Comment</h2> <p>Hi, ${
@@ -76,7 +70,6 @@ export class NotificationEmail {
             };
 
             const response = await apiInstance.sendTransacEmail(sendSmtpEmail);
-            console.log(colors.green("Email sent successfully:"), response);
         } catch (error) {
             console.error(colors.red("Error sending email:"), error);
         }
@@ -84,8 +77,6 @@ export class NotificationEmail {
 
     static topUpRequestUpdatedEmail = async (data: NotificationEmailProps) => {
         try {
-            console.log(colors.green("Sending email..."));
-
             const sendSmtpEmail = new brevo.SendSmtpEmail();
             sendSmtpEmail.subject = "PartnerSuite Notification";
             sendSmtpEmail.htmlContent = `<h2>Top-up request updated</h2> <p>Hi, ${data.name}.</p> <p>Your top-up request has been ${data.topUpRequestStatus}.</p> <strong> <a href="${process.env.FRONTEND_URL}/top-up-requests">View your top-up requests</a> </strong> <br /> <p>Cheers,</p> <p>PartnerSuite Team</p>`;
@@ -96,7 +87,6 @@ export class NotificationEmail {
             };
 
             const response = await apiInstance.sendTransacEmail(sendSmtpEmail);
-            console.log(colors.green("Email sent successfully:"), response);
         } catch (error) {
             console.error(colors.red("Error sending email:"), error);
         }

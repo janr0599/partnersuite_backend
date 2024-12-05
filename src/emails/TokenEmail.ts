@@ -26,8 +26,6 @@ type NotificationEmailProps = {
 // Function to send notification emails
 export const sendTokenEmail = async (data: NotificationEmailProps) => {
     try {
-        console.log(colors.green("Sending email..."));
-
         // Create the email object as specified
         const sendSmtpEmail = new brevo.SendSmtpEmail();
 
@@ -47,7 +45,6 @@ export const sendTokenEmail = async (data: NotificationEmailProps) => {
 
         // Send the email
         const response = await apiInstance.sendTransacEmail(sendSmtpEmail);
-        console.log(colors.green("Email sent successfully:"), response);
     } catch (error) {
         console.error(colors.red("Error sending email:"), error);
     }
