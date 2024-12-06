@@ -3,7 +3,6 @@ import Ticket from "../models/Ticket";
 import Affiliate from "../models/Affiliate";
 import { isAffiliate, isManager } from "../types/User";
 import Manager from "../models/Manager";
-import { subDays, startOfDay, endOfDay } from "date-fns";
 import { v4 as uuidv4 } from "uuid";
 
 class TicketsController {
@@ -76,15 +75,26 @@ class TicketsController {
 
     static getPreviousDayTickets = async (req: Request, res: Response) => {
         try {
-            const previousDay = subDays(new Date(), 1);
-            const start = startOfDay(previousDay);
-            const end = endOfDay(previousDay);
+            // Get the current date and subtract 1 day
+            const now = new Date();
+            const previousDay = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate() - 1
+            );
+
+            // Get the start and end times for the previous day
+            const start = new Date(previousDay.setHours(0, 0, 0, 0));
+            const end = new Date(previousDay.setHours(23, 59, 59, 999));
+
+            // Query for tickets created within the range
             const tickets = await Ticket.find({
                 createdAt: { $gte: start, $lte: end },
             });
-            res.status(200).json({ tickets: tickets });
+
+            res.status(200).json({ tickets });
         } catch (error) {
-            res.status(500).json({ message: "there's been an error" });
+            res.status(500).json({ message: "There's been an error" });
         }
     };
 
