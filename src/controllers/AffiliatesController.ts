@@ -51,6 +51,61 @@ class AffiliatesController {
         }
     };
 
+    static bulkAddAffiliates = async (req: Request, res: Response) => {
+        try {
+            const { affiliates } = req.body;
+            console.log(affiliates);
+
+            if (!isManager(req.user)) {
+                res.status(403).json({ message: "You are not authorized" });
+                return;
+            }
+
+            const newAffiliates = await Promise.all(
+                affiliates.map(async (affiliate) => {
+                    const { email, password } = affiliate;
+
+                    if (!isManager(req.user)) {
+                        res.status(403).json({
+                            message: "You are not authorized",
+                        });
+                        return;
+                    }
+
+                    const affiliateExists = await Affiliate.findOne({ email });
+                    if (affiliateExists) {
+                        throw new Error(
+                            `Affiliate with email ${email} already exists`
+                        );
+                    }
+
+                    const hashedPassword = await hashPassword(password);
+                    const newAffiliate = new Affiliate({
+                        ...affiliate,
+                        password: hashedPassword,
+                        manager: req.user._id,
+                    });
+
+                    req.user.affiliates.push(newAffiliate._id);
+
+                    return newAffiliate.save();
+                })
+            );
+
+            await req.user.save();
+
+            res.status(201).json({
+                message: `${newAffiliates.length} affiliates added successfully`,
+            });
+        } catch (error) {
+            console.error("Error:", error);
+            res.status(500).json({
+                message: "An error occurred",
+                error: error.message,
+            });
+        }
+    };
+
     static getAffiliates = async (req: Request, res: Response) => {
         const managerId = req.user._id;
         try {

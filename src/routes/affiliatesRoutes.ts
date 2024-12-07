@@ -18,6 +18,7 @@ router.param("affiliateId", validateObjectId);
 router.param("affiliateId", affiliateExists);
 
 router.post("/", validateAffiliateData, AffiliatesController.addAffiliate);
+router.post("/bulk-add", AffiliatesController.bulkAddAffiliates);
 router.get("/", AffiliatesController.getAffiliates);
 router.get("/:affiliateId", AffiliatesController.getAffiliateById);
 router.put(
