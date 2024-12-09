@@ -3,6 +3,9 @@ import { isAffiliate, isManager, UserType } from "../types/User";
 import Manager from "../models/Manager";
 import Affiliate from "../models/Affiliate";
 import { checkPassword, hashPassword } from "../utils/auth";
+import { v4 as uuidv4 } from "uuid";
+import cloudinary from "../config/cloudinary";
+import formidable from "formidable";
 
 export class ProfileController {
     static updateProfile = async (req: Request, res: Response) => {
@@ -91,4 +94,42 @@ export class ProfileController {
             res.status(500).json({ message: "There's been an error" });
         }
     };
+
+    static async uploadImage(req: Request, res: Response) {
+        const form = formidable({ multiples: false });
+
+        try {
+            form.parse(req, (err, fields, files) => {
+                cloudinary.uploader.upload(
+                    files.file[0].filepath,
+                    { public_id: uuidv4() },
+                    async function (error, result) {
+                        if (error) {
+                            const error = new Error("Invalid action");
+                            res.status(401).json({ error: error.message });
+                            return;
+                        }
+                        if (result) {
+                            if (isManager(req.user)) {
+                                const manager = await Manager.findById(
+                                    req.user.id
+                                );
+                                manager.image = result.secure_url;
+                                await manager.save();
+                            } else {
+                                const affiliate = await Affiliate.findById(
+                                    req.user.id
+                                );
+                                affiliate.image = result.secure_url;
+                                await affiliate.save();
+                            }
+                            res.json({ image: result.secure_url });
+                        }
+                    }
+                );
+            });
+        } catch (error) {
+            res.status(500).json({ message: "there's been an error" });
+        }
+    }
 }

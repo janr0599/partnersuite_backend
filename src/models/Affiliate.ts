@@ -39,6 +39,10 @@ const AffiliateSchema = new Schema({
         required: true,
         ref: "Manager",
     },
+    image: {
+        type: String,
+        default: "",
+    },
     status: {
         type: String,
         enum: Object.values(affiliateStatuses),

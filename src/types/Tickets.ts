@@ -9,6 +9,7 @@ export type TicketType = Document & {
     ticketId: string;
     title: string;
     description: string;
+    file: string;
     status: TicketStatus;
     category: TicketCategory;
     createdBy: Types.ObjectId;

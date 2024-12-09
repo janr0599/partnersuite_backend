@@ -4,10 +4,19 @@ import Affiliate from "../models/Affiliate";
 import { isAffiliate, isManager } from "../types/User";
 import Manager from "../models/Manager";
 import { v4 as uuidv4 } from "uuid";
+import cloudinary from "../config/cloudinary";
+import formidable from "formidable";
 
 class TicketsController {
     static createTicket = async (req: Request, res: Response) => {
         const affiliateId = req.user._id;
+
+        let ticketFile = "";
+
+        if (req.body.file) {
+            ticketFile = req.body.file;
+        }
+
         try {
             if (!isAffiliate(req.user)) {
                 const error = new Error("Invalid action");
@@ -32,6 +41,7 @@ class TicketsController {
                 createdBy: affiliateId,
                 manager: managerID,
                 ticketId: `T-${uuidv4().slice(0, 8)}`, // Generate unique ticket ID
+                file: ticketFile,
             });
 
             affiliate.tickets.push(ticket._id);
@@ -207,6 +217,31 @@ class TicketsController {
             res.status(500).json({ message: "there's been an error" });
         }
     };
+
+    static async uploadFile(req: Request, res: Response) {
+        const form = formidable({ multiples: false });
+
+        try {
+            form.parse(req, (err, fields, files) => {
+                cloudinary.uploader.upload(
+                    files.file[0].filepath,
+                    { public_id: uuidv4() },
+                    async function (error, result) {
+                        if (error) {
+                            const error = new Error("Invalid action");
+                            res.status(401).json({ error: error.message });
+                            return;
+                        }
+                        if (result) {
+                            res.json({ image: result.secure_url });
+                        }
+                    }
+                );
+            });
+        } catch (error) {
+            res.status(500).json({ message: "there's been an error" });
+        }
+    }
 }
 
 export default TicketsController;

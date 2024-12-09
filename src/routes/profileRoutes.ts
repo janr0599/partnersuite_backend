@@ -15,5 +15,6 @@ router.post(
     validateChangeCurrentPassword,
     ProfileController.changeCurrentPassword
 );
+router.post("/upload", ProfileController.uploadImage);
 
 export default router;

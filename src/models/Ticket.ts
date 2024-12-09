@@ -38,6 +38,10 @@ const TicketSchema: Schema = new Schema(
             enum: Object.values(ticketCategory),
             required: true,
         },
+        file: {
+            type: String,
+            default: "",
+        },
         status: {
             type: String,
             enum: Object.values(ticketStatus),

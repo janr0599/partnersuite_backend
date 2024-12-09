@@ -24,6 +24,9 @@ router.put("/:ticketId", validateTicketData, TicketsController.updateTicket);
 router.patch("/:ticketId", TicketsController.updateTicketStatus);
 router.delete("/:ticketId", TicketsController.deleteTicket);
 
+// Upload File Route
+router.post("/upload-file", TicketsController.uploadFile);
+
 // Comments Routes
 router.use("/:ticketId/comments", CommentsRoutes);
 

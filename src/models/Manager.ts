@@ -23,6 +23,10 @@ const ManagerSchema = new Schema({
         type: String,
         default: "manager",
     },
+    image: {
+        type: String,
+        default: "",
+    },
     affiliates: [
         {
             type: Types.ObjectId,

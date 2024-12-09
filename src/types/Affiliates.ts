@@ -14,6 +14,7 @@ export type AffiliateType = Document & {
     password: string;
     role: string;
     manager: Types.ObjectId;
+    image: string;
     status: AffiliateStatus;
     tickets: Types.ObjectId[];
     topUpRequests: (Types.ObjectId | TopUpRequestType)[];

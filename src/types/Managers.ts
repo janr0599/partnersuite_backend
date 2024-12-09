@@ -5,6 +5,7 @@ export type ManagerType = Document & {
     email: string;
     password: string;
     role: string;
+    image: string;
     affiliates: Types.ObjectId[];
     _id: Types.ObjectId;
 };
