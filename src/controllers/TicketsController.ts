@@ -163,6 +163,11 @@ class TicketsController {
     };
 
     static updateTicket = async (req: Request, res: Response) => {
+        let ticketFile = "";
+
+        if (req.body.file) {
+            ticketFile = req.body.file;
+        }
         try {
             if (!isAffiliate(req.user)) {
                 const error = new Error("Invalid action");
@@ -182,6 +187,7 @@ class TicketsController {
             req.ticket.title = req.body.title;
             req.ticket.description = req.body.description;
             req.ticket.category = req.body.category;
+            req.ticket.file = ticketFile;
 
             await req.ticket.save();
             res.status(200).json({

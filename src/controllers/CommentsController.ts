@@ -4,7 +4,6 @@ import { CommentParams, CommentType } from "../types/Comments";
 import { isManager } from "../types/User";
 import { NotificationEmail } from "../emails/NotificationsEmail";
 import Affiliate from "../models/Affiliate";
-import Manager from "../models/Manager";
 import Notification, {
     notificationStatus,
     notificationTypes,
@@ -47,19 +46,19 @@ class CommentsController {
             } else {
                 comment.createdByModel = "Affiliate";
                 // Find the manager of the affiliate
-                const manager = await Manager.findById(req.user.manager);
-                if (manager) {
-                    // Find the affiliate associated with this ticket or comment
-                    const affiliate = await Affiliate.findById(
-                        req.ticket.createdBy
-                    );
-                    recipientEmail = manager.email;
-                    recipientName = manager.name;
-                    affiliateName = affiliate.name;
-                    role = "Affiliate";
-                    recipientId = manager._id;
-                    recipientModel = "Manager";
-                }
+                // const manager = await Manager.findById(req.user.manager);
+                // if (manager) {
+                //     // Find the affiliate associated with this ticket or comment
+                //     const affiliate = await Affiliate.findById(
+                //         req.ticket.createdBy
+                //     );
+                //     recipientEmail = manager.email;
+                //     recipientName = manager.name;
+                //     affiliateName = affiliate.name;
+                //     role = "Affiliate";
+                //     recipientId = manager._id;
+                //     recipientModel = "Manager";
+                // }
             }
 
             req.ticket.comments.push(comment.id);
@@ -72,7 +71,7 @@ class CommentsController {
                     email: recipientEmail,
                     name: recipientName,
                     affiliateName,
-                    role,
+                    // role,
                     ticketId: req.ticket.id,
                 });
             } else {
