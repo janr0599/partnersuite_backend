@@ -49,3 +49,29 @@ export const sendTokenEmail = async (data: NotificationEmailProps) => {
         console.error(colors.red("Error sending email:"), error);
     }
 };
+
+export const sendTokenEmailAffiliate = async (data: NotificationEmailProps) => {
+    try {
+        // Create the email object as specified
+        const sendSmtpEmail = new brevo.SendSmtpEmail();
+
+        sendSmtpEmail.subject = "PartnerSuite Notification";
+        sendSmtpEmail.htmlContent = `
+                    <h2>Request to reset Password</h2>                 
+                    <p>Hi ${data.name},</p>
+                    <p>We received a request to reset your password. Click the link below and enter the confirmation token:</p>
+                    <p><strong>Confirmation Token: ${data.token}</strong>
+                    <p><a href="${process.env.FRONTEND_URL}/auth/new-password-affiliate">Reset Password</a><p>
+                    </p>If you didn’t request this action, you can safely ignore this email.</p>  </br> <p>Cheers,</p> <p>PartnerSuite Team</p>`;
+        sendSmtpEmail.to = [{ email: data.email, name: data.name }];
+        sendSmtpEmail.sender = {
+            email: "partnersuiteapp@gmail.com",
+            name: "PartnerSuite App",
+        };
+
+        // Send the email
+        const response = await apiInstance.sendTransacEmail(sendSmtpEmail);
+    } catch (error) {
+        console.error(colors.red("Error sending email:"), error);
+    }
+};

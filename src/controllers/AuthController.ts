@@ -6,7 +6,7 @@ import Affiliate from "../models/Affiliate";
 import Token from "../models/Token";
 import { generateToken } from "../utils/token";
 import { TokenType } from "../types/Token";
-import { sendTokenEmail } from "../emails/TokenEmail";
+import { sendTokenEmail, sendTokenEmailAffiliate } from "../emails/TokenEmail";
 
 class AuthController {
     static createAccount = async (req: Request, res: Response) => {
@@ -90,10 +90,10 @@ class AuthController {
 
             // Check if user Exists
             const userExists = async () => {
-                const affiliate = await Affiliate.findOne({ email });
-                if (affiliate) {
-                    return { user: affiliate, model: "Affiliate" };
-                }
+                // const affiliate = await Affiliate.findOne({ email });
+                // if (affiliate) {
+                //     return { user: affiliate, model: "Affiliate" };
+                // }
                 const manager = await Manager.findOne({ email });
                 if (manager) {
                     return { user: manager, model: "Manager" };
@@ -120,6 +120,56 @@ class AuthController {
 
             // Send confirmation email
             sendTokenEmail({
+                email: user.email,
+                name: user.name,
+                token: token.token,
+            });
+
+            res.status(200).json({
+                message:
+                    "We have sent you an email with instructions to reset your password",
+            });
+        } catch (error) {
+            res.status(500).json({ message: "there's been an error" });
+        }
+    };
+
+    static forgotPasswordAffiliate = async (req: Request, res: Response) => {
+        try {
+            const { email } = req.body;
+
+            // Check if user Exists
+            const userExists = async () => {
+                const affiliate = await Affiliate.findOne({ email });
+                if (affiliate) {
+                    return { user: affiliate, model: "Affiliate" };
+                }
+                // const manager = await Manager.findOne({ email });
+                // if (manager) {
+                //     return { user: manager, model: "Manager" };
+                // }
+                return null;
+            };
+
+            const result = await userExists();
+
+            if (!result) {
+                const error = new Error("User not found");
+                res.status(404).json({ error: error.message });
+                return;
+            }
+
+            const { user, model } = result;
+
+            // Generate token
+            const token = new Token();
+            token.token = generateToken();
+            token.recipient = user._id;
+            token.recipientModel = model as "Affiliate" | "Manager";
+            await token.save();
+
+            // Send confirmation email
+            sendTokenEmailAffiliate({
                 email: user.email,
                 name: user.name,
                 token: token.token,

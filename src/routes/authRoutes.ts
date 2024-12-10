@@ -21,6 +21,11 @@ router.post("/login-affiliate", authenticate, AuthController.login);
 router.get("/user", authenticate, AuthController.user);
 
 router.post("/forgot-password", validateEmail, AuthController.forgotPassword);
+router.post(
+    "/forgot-password-affiliate",
+    validateEmail,
+    AuthController.forgotPasswordAffiliate
+);
 router.post("/validate-token", validateToken, AuthController.validateToken);
 router.post(
     "/update-password/:token",
