@@ -5,6 +5,7 @@ export type TopUpRequestStatus =
     (typeof TopUpRequestStatus)[keyof typeof TopUpRequestStatus];
 
 export type TopUpRequestType = Document & {
+    topUpRequestId: string;
     createdBy: Types.ObjectId;
     BonusAmount: number;
     status: TopUpRequestStatus;

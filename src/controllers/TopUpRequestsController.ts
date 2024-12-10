@@ -13,6 +13,7 @@ import Notification, {
     notificationStatus,
     notificationTypes,
 } from "../models/Notification";
+import { v4 as uuidv4 } from "uuid";
 
 class TopUpRequestsController {
     static createTopUpRequest = async (req: Request, res: Response) => {
@@ -50,6 +51,7 @@ class TopUpRequestsController {
             const topUpRequest = new TopUpRequest({
                 createdBy: req.user._id,
                 BonusAmount: req.user.BonusAmount,
+                topUpRequestId: `T-${uuidv4().slice(0, 8)}`,
             });
 
             affiliate.topUpRequests.push(topUpRequest._id);

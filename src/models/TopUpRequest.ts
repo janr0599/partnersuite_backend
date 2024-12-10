@@ -9,6 +9,11 @@ export const TopUpRequestStatus = {
 
 const TopUpRequestSchema = new Schema(
     {
+        topUpRequestId: {
+            type: String,
+            unique: true,
+            required: true,
+        },
         createdBy: {
             type: Types.ObjectId,
             ref: "Affiliate",
