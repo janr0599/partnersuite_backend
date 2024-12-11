@@ -1,5 +1,7 @@
 import { Schema, model, Types } from "mongoose";
 import { NotificationType } from "../types/Notifications";
+import Affiliate from "./Affiliate";
+import Manager from "./Manager";
 
 export const notificationStatus = {
     READ: "read",

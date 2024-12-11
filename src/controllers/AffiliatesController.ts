@@ -88,6 +88,12 @@ class AffiliatesController {
 
                     req.user.affiliates.push(newAffiliate._id);
 
+                    // Send notification email
+                    NotificationEmail.affiliateAccountCreatedEmail({
+                        email: newAffiliate.email,
+                        name: newAffiliate.name,
+                    });
+
                     return newAffiliate.save();
                 })
             );

@@ -1,5 +1,6 @@
 import { Schema, model, Types } from "mongoose";
 import { AffiliateType } from "../types/Affiliates";
+import Manager from "./Manager";
 
 export const contractTypes = {
     CPA: "CPA",
@@ -95,6 +96,15 @@ const AffiliateSchema = new Schema({
         type: Number,
         default: 0,
     },
+});
+
+AffiliateSchema.pre("deleteOne", { document: true }, async function () {
+    const affiliateId = this._id;
+    if (!affiliateId) return;
+    await Manager.updateOne(
+        { affiliates: affiliateId },
+        { $pull: { affiliates: affiliateId } }
+    );
 });
 
 const Affiliate = model<AffiliateType>("Affiliate", AffiliateSchema);

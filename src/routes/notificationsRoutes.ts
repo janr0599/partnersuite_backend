@@ -13,5 +13,6 @@ router.post(
     NotificationsController.markNotificationAsRead
 );
 router.post("/", NotificationsController.markAllNotificationsAsRead);
+router.delete("/", NotificationsController.deleteAllNotifications);
 
 export default router;

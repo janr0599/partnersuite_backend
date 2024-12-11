@@ -52,4 +52,20 @@ export class NotificationsController {
             res.status(500).json({ message: "there's been an error" });
         }
     };
+
+    static deleteAllNotifications = async (req: Request, res: Response) => {
+        try {
+            const notifications = await Notification.find({
+                recipient: req.user._id,
+            });
+            for (const notification of notifications) {
+                await notification.deleteOne();
+            }
+            res.status(200).json({
+                message: "All notifications deleted successfully",
+            });
+        } catch (error) {
+            res.status(500).json({ message: "there's been an error" });
+        }
+    };
 }
