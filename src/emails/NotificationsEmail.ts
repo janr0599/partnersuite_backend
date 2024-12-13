@@ -89,4 +89,28 @@ export class NotificationEmail {
             console.error(colors.red("Error sending email:"), error);
         }
     };
+
+    static sendTrialEndEmail = async (data: NotificationEmailProps) => {
+        try {
+            // Create the email object as specified
+            const sendSmtpEmail = new brevo.SendSmtpEmail();
+
+            sendSmtpEmail.subject = "PartnerSuite Notification";
+            sendSmtpEmail.htmlContent = `
+                    <h2>PartnerSuite Trial End</h2>                 
+                    <p>Hi, ${data.name}</p>
+                    <p>The 2-week trial period for the affiliate ${data.affiliateName} has ended.</p>
+                    <p>Cheers,</p>
+                    <p>PartnerSuite Team</p>`;
+            sendSmtpEmail.to = [{ email: data.email, name: data.name }];
+            sendSmtpEmail.sender = {
+                email: "partnersuiteapp@gmail.com",
+                name: "PartnerSuite App",
+            };
+
+            const response = await apiInstance.sendTransacEmail(sendSmtpEmail);
+        } catch (error) {
+            console.error(colors.red("Error sending email:"), error);
+        }
+    };
 }

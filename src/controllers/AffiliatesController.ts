@@ -54,7 +54,6 @@ class AffiliatesController {
     static bulkAddAffiliates = async (req: Request, res: Response) => {
         try {
             const { affiliates } = req.body;
-            console.log(affiliates);
 
             if (!isManager(req.user)) {
                 res.status(403).json({ message: "You are not authorized" });

@@ -1,5 +1,6 @@
 import server from "./server";
 import colors from "colors";
+import "./utils/cron";
 
 const port = process.env.PORT || 4000;
 
