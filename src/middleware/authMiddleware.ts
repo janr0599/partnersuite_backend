@@ -115,7 +115,10 @@ export const authenticate = async (
             if (decoded.role === "manager") {
                 user = await Manager.findById(decoded.id);
             } else if (decoded.role === "affiliate") {
-                user = await Affiliate.findById(decoded.id);
+                user = await Affiliate.findById(decoded.id).populate(
+                    "manager",
+                    "name"
+                );
             }
 
             if (user) {
